@@ -281,6 +281,20 @@ public class Hospital {
 	 * @return Paciente de mayor edad, null si no hay pacientes en el hospital.
 	 */
 	public Paciente darPacienteMayorEdad() {
+		Paciente paciente = null;
+		Paciente personaMayor = null;
+		for(Unidad unidad:unidades)
+		{			
+			paciente = unidad.darPacienteMayorEdad();
+			if(paciente != null)
+			{
+				if(paciente.darEdad()>= personaMayor.darEdad())
+				{
+					personaMayor = paciente;
+					return personaMayor;
+				}	
+			}					
+		}
 		return null;
 	}
 
