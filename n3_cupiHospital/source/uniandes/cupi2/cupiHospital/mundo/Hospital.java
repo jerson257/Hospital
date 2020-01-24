@@ -10,6 +10,9 @@
  */
 package uniandes.cupi2.cupiHospital.mundo;
 
+import java.util.ArrayList;
+import java.util.function.IntConsumer;
+
 import uniandes.cupi2.cupiHospital.mundo.Paciente.Motivo;
 import uniandes.cupi2.cupiHospital.mundo.Unidad.Tipo;
 
@@ -55,8 +58,8 @@ public class Hospital {
 		unidades[1]= new Unidad("Unidad B",Tipo.CUIDADOS_INTERMEDIOS);
 		unidades[2]= new Unidad("Unidad C",Tipo.PEDIATRIA);
 		unidades[3]= new Unidad("Unidad D",Tipo.MATERNIDAD);
-		unidades[4]= new Unidad("unidad E",Tipo.GERIATRIA);
-		unidades[5]= new Unidad("unidad F",Tipo.OBSERVACION);		
+		unidades[4]= new Unidad("Unidad E",Tipo.GERIATRIA);
+		unidades[5]= new Unidad("Unidad F",Tipo.OBSERVACION);		
 	}
 
 	// -------------------------------------------------------------
@@ -100,17 +103,18 @@ public class Hospital {
 			Motivo pMotivoIngreso) {
 		if(buscarPaciente(pNumeroIdentificacion)!=null)
 		{
-			if(pNombreUnidad == "PEDIATRIA" && pEdad > Unidad.EDAD_MAX_PEDIATRIA)
-			{
-				return Boolean.FALSE;
-			}
-			if(pNombreUnidad == "GERIATRIA" && pEdad < Unidad.EDAD_MIN_GERIATRIA)
-			{
-				return Boolean.FALSE;
-			}
+			return Boolean.FALSE;
 		}
 		else
 		{
+			if(pNombreUnidad == "Unidad C" && pEdad > Unidad.EDAD_MAX_PEDIATRIA)
+			{
+				return Boolean.FALSE;
+			}
+			if(pNombreUnidad == "Unidad E" && pEdad < Unidad.EDAD_MIN_GERIATRIA)
+			{
+				return Boolean.FALSE;
+			}
 			Unidad unidad = buscarUnidad(pNombreUnidad);
 			if(unidad != null)
 			{
@@ -151,7 +155,20 @@ public class Hospital {
 	 * @return True si el paciente es dado de alta, false en caso de no encontrarlo.
 	 */
 	public boolean darDeAltaPaciente(int pNumeroIdentificacion) {
-		// TODO Parte3 PuntoF: Complete el método según la documentación dada.
+		Paciente paciente = null;
+		if(pNumeroIdentificacion > 0)
+		{
+			for(Unidad unidades : unidades)
+			{
+				paciente = unidades.buscarPaciente(pNumeroIdentificacion);
+				if(paciente!=null)
+				{
+					unidades.darDeAltaPaciente(pNumeroIdentificacion);
+					return Boolean.TRUE;
+				}
+			}			
+		}
+		return Boolean.FALSE;		
 	}
 
 	/**
@@ -169,7 +186,36 @@ public class Hospital {
 	 * @return True si pudo reubicar el paciente, false en caso contrario.
 	 */
 	public boolean reubicarPaciente(int pNumeroIdentificacion, String pNuevaUnidad) {
-		// TODO Parte3 PuntoG: Complete el método según la documentación dada.
+		Paciente paciente = buscarPaciente(pNumeroIdentificacion);
+		Unidad unidadPaciente = buscarUnidadPaciente(pNumeroIdentificacion);
+		Unidad unidad = buscarUnidad(pNuevaUnidad);
+		if(paciente == null)
+		{
+			return Boolean.FALSE;
+		}
+		if(pNuevaUnidad == "Unidad C" && 
+				paciente.darEdad() > Unidad.EDAD_MAX_PEDIATRIA)
+		{			
+			return Boolean.FALSE;			
+		}
+		if(pNuevaUnidad == "Unidad E" && 
+				paciente.darEdad() < Unidad.EDAD_MIN_GERIATRIA)
+		{		
+			return Boolean.FALSE;			
+		}
+		
+		if(pNuevaUnidad != unidadPaciente.darNombre())
+		{
+			if(unidad != null)
+			{
+				unidad.agregarPaciente(paciente.darNombre(),paciente.darApellido(), 
+						pNumeroIdentificacion,paciente.darEdad(),paciente.darDiagnostico(),
+						paciente.darDiasHospitalizacion(),paciente.darMotivoIngreso());
+				unidadPaciente.darDeAltaPaciente(pNumeroIdentificacion);
+				return Boolean.TRUE;		
+			}
+		}	
+		return Boolean.FALSE;		
 	}
 
 	/**
@@ -180,7 +226,19 @@ public class Hospital {
 	 *         encontrar el paciente.
 	 */
 	public Unidad buscarUnidadPaciente(int pNumeroIdentificacion) {
-		// TODO Parte3 PuntoH: Complete el método según la documentación dada.
+		Paciente paciente = null;
+		if(pNumeroIdentificacion > 0)
+		{
+			for(Unidad unidades : unidades)
+			{
+				paciente = unidades.buscarPaciente(pNumeroIdentificacion);
+				if(paciente!=null)
+				{
+					return unidades;
+				}
+			}			
+		}
+		return null;
 	}
 
 	/**
@@ -208,7 +266,12 @@ public class Hospital {
 	 * @return Cantidad total de pacientes en el hospital.
 	 */
 	public int darCantidadTotalPacientes() {
-		// TODO Parte3 PuntoJ: Complete el método según la documentación dada.
+		int totalPacientes = 0;
+		for(Unidad unidad : unidades)
+		{
+			totalPacientes += unidad.darPacientes().size();	
+		}
+		return totalPacientes;
 	}
 
 	/**
@@ -218,7 +281,7 @@ public class Hospital {
 	 * @return Paciente de mayor edad, null si no hay pacientes en el hospital.
 	 */
 	public Paciente darPacienteMayorEdad() {
-		// TODO Parte3 PuntoK: Complete el método según la documentación dada.
+		return null;
 	}
 
 	/**
@@ -235,7 +298,24 @@ public class Hospital {
 	 *         encargado o si no existe una unidad con el nombre dado.
 	 */
 	public boolean asignarEncargado(String pNombre, int pAniosExperiencia, String pUnidad) {
-		// TODO Parte3 PuntoL: Complete el método según la documentación dada.
+		
+		if(buscarUnidad(pUnidad)!=null)
+		{
+			for(Unidad unidad : unidades)
+			{
+				if(unidad.darEncargado()!=null)
+				{
+					return Boolean.FALSE;
+				}
+				
+				unidad.asignarEncargado(pNombre, pAniosExperiencia);				
+			}
+			return Boolean.TRUE;
+		}
+		else
+		{
+			return Boolean.FALSE;
+		}		
 	}
 
 	// -----------------------------------------------------------------

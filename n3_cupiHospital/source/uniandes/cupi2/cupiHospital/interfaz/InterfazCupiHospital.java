@@ -84,7 +84,7 @@ public class InterfazCupiHospital extends JFrame
 		panelImagen = new PanelImagen();
 		add( panelImagen, BorderLayout.NORTH );
 
-		panelUnidad = new PanelUnidad(this);
+		panelUnidad = new PanelUnidad( this );
 		add( panelUnidad, BorderLayout.CENTER );
 		
 		panelOpciones = new PanelOpciones( this );

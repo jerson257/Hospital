@@ -222,7 +222,7 @@ public class PanelUnidad extends JPanel implements ActionListener {
 
 		Unidad unidad = principal.buscarUnidad(nombreUnidad);
 
-		txtCantidad.setText("" + unidad.darPacientes().size());
+		txtCantidad.setText(" " + unidad.darPacientes().size());
 
 		String url = "data/" + unidad.darNombre() + ".png";
 		ImageIcon icono = new ImageIcon(url);
